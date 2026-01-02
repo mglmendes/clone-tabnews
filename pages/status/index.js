@@ -11,8 +11,6 @@ export default function StatusPage() {
     <>
       <h1>Status</h1>
       <UpdatedAt />
-
-      <h1>Database</h1>
       <DatabaseStatus />
     </>
   );
