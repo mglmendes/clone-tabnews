@@ -1,25 +1,35 @@
 import { useEffect } from "react";
 
-function Home() {
+export default function Home() {
   useEffect(() => {
-    // RESET GLOBAL FORÇADO
-    document.documentElement.style.margin = "0";
-    document.documentElement.style.padding = "0";
-    document.documentElement.style.width = "100%";
-    document.documentElement.style.height = "100%";
-    document.documentElement.style.overflow = "hidden";
+    // RESET TOTAL (remove bordas e scroll)
+    const html = document.documentElement;
+    const body = document.body;
 
-    document.body.style.margin = "0";
-    document.body.style.padding = "0";
-    document.body.style.width = "100%";
-    document.body.style.height = "100%";
-    document.body.style.overflow = "hidden";
+    html.style.margin = "0";
+    html.style.padding = "0";
+    html.style.height = "100%";
+    html.style.overflow = "hidden";
+
+    body.style.margin = "0";
+    body.style.padding = "0";
+    body.style.height = "100%";
+    body.style.overflow = "hidden";
+
+    // Carrega fonte Bebas Neue (Rainbow Six Siege style)
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap";
+    document.head.appendChild(link);
   }, []);
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>SiegeNews</h1>
+      {/* SOMENTE este texto usa a fonte Siege */}
+      <h1 style={styles.title}>SIEGENEWS</h1>
 
+      {/* TODO o resto permanece em Arial */}
       <p style={styles.subtitle}>
         O site <strong>siegenews.com.br</strong> está em desenvolvimento 🚧
       </p>
@@ -35,7 +45,7 @@ function Home() {
 const styles = {
   container: {
     position: "fixed",
-    inset: 0, // substitui 100vh / 100vw
+    inset: 0,
     backgroundColor: "#0f172a",
     color: "#e5e7eb",
     display: "flex",
@@ -43,23 +53,27 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     textAlign: "center",
-    fontFamily: "Arial, sans-serif",
+
+    // Fonte padrão do site
+    fontFamily: "Arial, Helvetica, sans-serif",
+  },
+  logo: {
+    width: "240px",
+    marginBottom: "30px",
   },
   title: {
+    fontFamily: "'Bebas Neue', sans-serif", // 👈 só o SIEGENEWS
     fontSize: "3rem",
-    margin: "0 0 12px 0",
+    marginBottom: "10px",
     letterSpacing: "2px",
   },
   subtitle: {
-    fontSize: "1.2rem",
-    margin: "0 0 10px 0",
+    fontSize: "1.3rem",
+    marginBottom: "15px",
   },
   description: {
-    maxWidth: "520px",
+    maxWidth: "500px",
     fontSize: "1rem",
     opacity: 0.9,
-    margin: 0,
   },
 };
-
-export default Home;
