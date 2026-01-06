@@ -1,5 +1,6 @@
 import database from "infra/database.js";
 import { ValidationError, NotFoundError } from "infra/errors.js";
+import password from "./password.js";
 
 async function findOneByUsername(username) {
   const userFound = await runSelectQuery(username);
@@ -35,30 +36,10 @@ async function findOneByUsername(username) {
 async function create(userInputValues) {
   await validateUniqueAttribute("email", userInputValues.email);
   await validateUniqueAttribute("username", userInputValues.username);
+  await hashPasswordInObject(userInputValues);
 
   const newUser = await runInsertQuery(userInputValues);
   return newUser;
-
-  async function validateUniqueAttribute(field, value) {
-    const result = await database.query({
-      text: `
-          SELECT 
-            ${field}
-          FROM
-            users
-          WHERE
-            LOWER(${field}) = LOWER($1)
-          ;`,
-      values: [value],
-    });
-
-    if (result.rowCount > 0) {
-      throw new ValidationError({
-        message: `O ${field} informado já está sendo utilizado.`,
-        action: `Utilize outro ${field} para realizar o cadastro.`,
-      });
-    }
-  }
 
   async function runInsertQuery(userInputValues) {
     const result = await database.query({
@@ -80,9 +61,91 @@ async function create(userInputValues) {
   }
 }
 
+async function update(username, userInputValues) {
+  const currentUser = await findOneByUsername(username);
+
+  if ("username" in userInputValues) {
+    if (
+      currentUser.username.toLowerCase() !=
+      userInputValues.username.toLowerCase()
+    ) {
+      await validateUniqueAttribute("username", userInputValues.username);
+    }
+  }
+
+  if ("email" in userInputValues) {
+    await validateUniqueAttribute("email", userInputValues.email);
+  }
+
+  if ("password" in userInputValues) {
+    await hashPasswordInObject(userInputValues);
+  }
+
+  const userWithNewValues = {
+    ...currentUser,
+    ...userInputValues,
+  };
+
+  const updatedUser = await runUpdateQuery(userWithNewValues);
+  return updatedUser;
+
+  async function runUpdateQuery(userWithNewValues) {
+    const result = await database.query({
+      text: `
+        UPDATE 
+          users
+        SET
+          username = $2,
+          email = $3,
+          password  = $4,
+          updated_at = timezone('utc', now())
+        WHERE
+          id = $1
+        RETURNING
+          *
+      `,
+      values: [
+        userWithNewValues.id,
+        userWithNewValues.username,
+        userWithNewValues.email,
+        userWithNewValues.password,
+      ],
+    });
+
+    return result.rows[0];
+  }
+}
+
+async function validateUniqueAttribute(field, value) {
+  const result = await database.query({
+    text: `
+          SELECT 
+            ${field}
+          FROM
+            users
+          WHERE
+            LOWER(${field}) = LOWER($1)
+          ;`,
+    values: [value],
+  });
+
+  if (result.rowCount > 0) {
+    throw new ValidationError({
+      message: `O ${field} informado já está sendo utilizado.`,
+      action: `Utilize outro ${field} para realizar esta operação.`,
+    });
+  }
+}
+
+async function hashPasswordInObject(userInputValues) {
+  const hashedPassword = await password.hash(userInputValues.password);
+  userInputValues.password = hashedPassword;
+}
+
 const user = {
   create,
   findOneByUsername,
+  update,
 };
 
 export default user;
