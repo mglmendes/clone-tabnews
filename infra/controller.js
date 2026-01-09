@@ -9,11 +9,14 @@ import {
 } from "infra/errors.js";
 
 function onErrorHandler(error, request, response) {
-  if (
-    error instanceof ValidationError ||
-    error instanceof NotFoundError ||
-    error instanceof UnauthorizedError
-  ) {
+  console.log(error);
+  if (error instanceof ValidationError || error instanceof NotFoundError) {
+    return response.status(error.status_code).json(error);
+  }
+
+  if (error instanceof UnauthorizedError) {
+    console.log("BATE AQ");
+    clearSessionCookie(response);
     return response.status(error.status_code).json(error);
   }
 
