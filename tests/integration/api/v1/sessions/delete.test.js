@@ -12,9 +12,7 @@ beforeAll(async () => {
 describe("DELETE /api/v1/sessions", () => {
   describe("Default user", () => {
     test("With valid session", async () => {
-      const createdUser = await orchestrator.createUser({
-        username: "UserWithValidSession",
-      });
+      const createdUser = await orchestrator.createUser();
 
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
@@ -39,17 +37,18 @@ describe("DELETE /api/v1/sessions", () => {
       });
 
       expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.expires_at)).not.toBeNaN();
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
 
       expect(
         responseBody.expires_at < sessionObject.expires_at.toISOString(),
-      ).toEqual(true);
+      ).toBe(true);
       expect(
         responseBody.updated_at > sessionObject.updated_at.toISOString(),
-      ).toEqual(true);
+      ).toBe(true);
 
-      // Set‑Cookie assertions
+      // Set-Cookie assertions
       const parsedSetCookie = setCookieParser(response, {
         map: true,
       });
@@ -62,11 +61,12 @@ describe("DELETE /api/v1/sessions", () => {
         httpOnly: true,
       });
 
+      // Double check assertions
       const doubleCheckResponse = await fetch(
         "http://localhost:3000/api/v1/user",
         {
           headers: {
-            Cookie: `session_id: ${sessionObject.token}`,
+            Cookie: `session_id=${sessionObject.token}`,
           },
         },
       );
