@@ -32,7 +32,7 @@ describe("GET /api/v1/status", () => {
         "read:status:all",
       ]);
 
-      const sessionObject = await orchestrator.createSession(privilegedUser.id);
+      const sessionObject = await orchestrator.createSession(privilegedUser);
 
       const response = await fetch("${webserver.origin}/api/v1/status", {
         headers: {
