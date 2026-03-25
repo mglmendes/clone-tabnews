@@ -15,7 +15,7 @@ describe("Use case: Registration Flow (all successfull)", () => {
   let activationTokenId;
   let createSessionResponseBody;
   test("Create user account", async () => {
-    const createUserResponse = await fetch("${webserver.origin}/api/v1/users", {
+    const createUserResponse = await fetch(`${webserver.origin}/api/v1/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

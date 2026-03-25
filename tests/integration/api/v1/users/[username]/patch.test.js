@@ -1,5 +1,6 @@
 import orchestrator from "tests/orchestrator.js";
 import { version as uuidVersion } from "uuid";
+import webserver from "infra/webserver";
 import user from "models/user.js";
 import password from "models/password.js";
 
@@ -49,7 +50,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(activatedUser);
 
       const response = await fetch(
-        "${webserver.origin}/api/v1/users/UsuarioInexistente",
+        `${webserver.origin}/api/v1/users/UsuarioInexistente`,
         {
           method: "PATCH",
           headers: {
@@ -83,7 +84,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 
       const sessionObject2 = await orchestrator.createSession(activatedUser2);
 
-      const response = await fetch("${webserver.origin}/api/v1/users/user2", {
+      const response = await fetch(`${webserver.origin}/api/v1/users/user2`, {
         method: "PATCH",
         headers: {
           cookie: `session_id=${sessionObject2.token}`,
@@ -119,7 +120,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 
       const sessionObject2 = await orchestrator.createSession(activatedUserB);
 
-      const response = await fetch("${webserver.origin}/api/v1/users/userA", {
+      const response = await fetch(`${webserver.origin}/api/v1/users/userA`, {
         method: "PATCH",
         headers: {
           cookie: `session_id=${sessionObject2.token}`, // token do user 2
@@ -233,7 +234,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(activatedUser);
 
       const response = await fetch(
-        "${webserver.origin}/api/v1/users/mismatchedUser",
+        `${webserver.origin}/api/v1/users/mismatchedUser`,
         {
           method: "PATCH",
           headers: {
