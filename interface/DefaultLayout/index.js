@@ -12,7 +12,6 @@ export default function DefaultLayout({
   contentWidth,
 }) {
   const extraContentClassName = contentWidthClasses[contentWidth];
-  console.log(extraContentClassName);
   return (
     <>
       <Head>
